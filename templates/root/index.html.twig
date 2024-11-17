@@ -1,9 +1,49 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<h1>Upload a File</h1>
-<form action="{{ path('app_upload') }}" method="post" enctype="multipart/form-data">
-    <input type="file" name="file" required>
-    <button type="submit">Upload</button>
-</form>
+    <div class="min-h-screen relative">
+        <div class="absolute inset-0 bg-cover bg-center blur"
+             style="background-image: url('https://picsum.photos/1920/1080');">
+        </div>
+        <div class="absolute w-1/2 inset-0 bg-white flex items-center justify-start" style="clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 0% 100%);">
+            <div class="p-8 h-full content-center">
+                <h1 class="text-4xl font-bold mb-6">Upload Your File</h1>
+                <p class="text-gray-700 mb-4">
+                    Share files quickly and securely. Fill out the form below to get started.
+                </p>
+                <form
+                        action="{{ path('app_upload') }}"
+                        method="post"
+                        enctype="multipart/form-data"
+                        class="space-y-6"
+                >
+                    <div>
+                        <label for="file" class="block text-sm font-medium text-gray-700">Select File</label>
+                        <input
+                                type="file"
+                                id="file"
+                                name="file"
+                                class="mt-2 block w-full text-sm border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-600"
+                                required
+                        />
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email (Optional)</label>
+                        <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="mt-2 block w-full text-sm border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-600"
+                        />
+                    </div>
+                    <button
+                            type="submit"
+                            class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none"
+                    >
+                        Upload
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}
