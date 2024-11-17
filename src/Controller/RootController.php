@@ -26,6 +26,11 @@ class RootController extends AbstractController
             return new Response('No file uploaded.', 400);
         }
 
+        $maxFileSize = 1.5 * 1024 * 1024 * 1024;
+        if ($file->getSize() > $maxFileSize) {
+            return new Response('File is too large. Maximum size allowed is 1.5 GB.', 400);
+        }
+
         $originalFileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $safeFileName = $slugger->slug($originalFileName);
         $newFileName = $safeFileName.'-'.uniqid().'.'.$file->guessExtension();
