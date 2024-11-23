@@ -8,8 +8,16 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * Repository for managing File entities.
+ *
+ * This repository provides custom methods for interacting with the File entity.
+ */
 class FileRepository extends ServiceEntityRepository
 {
+    /**
+     * @var EntityManagerInterface The entity manager used to persist and flush data.
+     */
     private EntityManagerInterface $em;
 
     public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
@@ -20,12 +28,17 @@ class FileRepository extends ServiceEntityRepository
     }
 
     /**
-     * Creates and saves a File entity.
+     * Saves a new File entity to the database.
      *
-     * @param string             $fileName   The name of the file
-     * @param string             $filePath   The path to the file
-     * @param int                $fileSize   The size of the file in bytes
-     * @param DateTimeInterface  $uploadDate The date the file was uploaded
+     * This method creates a new File entity, sets its properties, and persists it
+     * to the database. It then flushes the changes to ensure the entity is stored.
+     *
+     * @param string $fileName The name of the file being saved.
+     * @param string $filePath The file's storage path.
+     * @param int $fileSize The size of the file in bytes.
+     * @param DateTimeInterface $uploadDate The date and time when the file was uploaded.
+     *
+     * @return void
      */
     public function save(string $fileName, string $filePath, int $fileSize,
                          DateTimeInterface $uploadDate): void
@@ -40,29 +53,4 @@ class FileRepository extends ServiceEntityRepository
         $this->em->persist($fileEntity);
         $this->em->flush();
     }
-
-    //    /**
-    //     * @return File[] Returns an array of File objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('f')
-    //            ->andWhere('f.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('f.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?File
-    //    {
-    //        return $this->createQueryBuilder('f')
-    //            ->andWhere('f.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }
