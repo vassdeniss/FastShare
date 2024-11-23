@@ -40,6 +40,19 @@ class RootController extends AbstractController
             return $this->redirectToRoute('app_root');
         }
 
+        $allowedMimeTypes = [
+            'image/jpeg', 'image/png', 'image/gif',
+            'video/mp4', 'video/mpeg', 'video/quicktime',
+            'application/zip', 'application/x-zip-compressed', 'application/octet-stream'
+        ];
+
+        if (!in_array($file->getMimeType(), $allowedMimeTypes, true)) {
+            $flasher
+                ->option('position', 'top-left')
+                ->error('Invalid file type.');
+            return $this->redirectToRoute('app_root');
+        }
+
         // Magic number: 1.5gb into bytes
         $maxFileSize = 1.5e+9;
         $fileSize = $file->getSize();
