@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Repository;
+
+use App\Entity\File;
+use App\Entity\Link;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Uid\Uuid;
+
+/**
+ * Repository for managing Link entities.
+ *
+ * This repository provides custom methods for interacting with the Link entity.
+ */
+class LinkRepository extends ServiceEntityRepository
+{
+    private EntityManagerInterface $em;
+
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
+    {
+        parent::__construct($registry, Link::class);
+        $this->em = $em;
+    }
+
+    /**
+     * Creates a new Link entity for the given File and persists it to the database.
+     * @param File $file The File entity for which the link is being generated.
+     * @return Link The newly created Link entity.
+     */
+    public function save(File $file): Link
+    {
+        $link = new Link();
+        $link->setFile($file);
+        $link->setToken(Uuid::v4()->toRfc4122());
+        $link->setExpiresAt((new \DateTime())->modify('+24 hours'));
+
+        $this->em->persist($link);
+        $this->em->flush();
+
+        return $link;
+    }
+
+    /**
+     * Finds a Link entity by its token.
+     *
+     * This method retrieves a single Link entity that matches the provided token.
+     *
+     * @param string $token The token associated with the Link.
+     *
+     * @return Link|null The Link entity if found, or null if no matching Link is found.
+     */
+    public function findOneByToken(string $token): ?Link
+    {
+        return $this->findOneBy(['token' => $token]);
+    }
+}

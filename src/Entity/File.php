@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\FileRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
@@ -31,6 +32,9 @@ class File
 
     #[ORM\Column]
     private int $downloadCount = 0;
+
+    #[ORM\OneToOne(targetEntity: Link::class, mappedBy: 'file')]
+    private ?Link $link = null;
 
     public function getId(): ?Uuid
     {
@@ -100,6 +104,23 @@ class File
     public function setDownloadCount(int $downloadCount): static
     {
         $this->downloadCount = $downloadCount;
+
+        return $this;
+    }
+
+    public function getLink(): ?Link
+    {
+        return $this->link;
+    }
+
+    public function setLink(Link $link): static
+    {
+        // set the owning side of the relation if necessary
+        if ($link->getFile() !== $this) {
+            $link->setFile($this);
+        }
+
+        $this->link = $link;
 
         return $this;
     }

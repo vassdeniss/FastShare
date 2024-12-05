@@ -38,10 +38,10 @@ class FileRepository extends ServiceEntityRepository
      * @param int $fileSize The size of the file in bytes.
      * @param DateTimeInterface $uploadDate The date and time when the file was uploaded.
      *
-     * @return void
+     * @return File The newly created File entity.
      */
     public function save(string $fileName, string $filePath, int $fileSize,
-                         DateTimeInterface $uploadDate): void
+                         DateTimeInterface $uploadDate): File
     {
         $fileEntity = new File();
         $fileEntity
@@ -52,5 +52,7 @@ class FileRepository extends ServiceEntityRepository
 
         $this->em->persist($fileEntity);
         $this->em->flush();
+
+        return $fileEntity;
     }
 }

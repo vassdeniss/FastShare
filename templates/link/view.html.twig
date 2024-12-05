@@ -1,0 +1,27 @@
+﻿{% extends 'base.html.twig' %}
+
+{% block title %}View Shared File{% endblock %}
+
+{% block body %}
+<div class="min-h-screen relative">
+    <div class="absolute inset-0 bg-cover bg-center blur"
+         style="background-image: url('https://picsum.photos/1920/1080');">
+    </div>
+    <div class="relative flex justify-center items-center min-h-screen">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <div class="mb-6">
+                <img id="uploaded-image"
+                     data-controller="image-loader"
+                     data-image-loader-token-value="{{ token }}"
+                     data-image-loader-image-url-value="{{ path('app_serve_file', {'token': token}) }}"
+                     src="" alt="Uploaded Image"
+                     style="max-width: 50%; height: auto; margin-left: auto; margin-right: auto">
+            </div>
+            <a href="{{ path('app_root') }}"
+               class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none">
+                Go Back
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

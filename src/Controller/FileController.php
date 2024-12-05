@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\FileRepository;
+use App\Repository\LinkRepository;
 use DateTime;
 use Exception;
 use Flasher\Prime\FlasherInterface;
@@ -17,14 +18,17 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class FileController extends AbstractController
 {
     private FileRepository $fileRepository;
+    private LinkRepository $linkRepository;
 
-    public function __construct(FileRepository $fileRepository)
+    public function __construct(FileRepository $fileRepository, LinkRepository $linkRepository)
     {
         $this->fileRepository = $fileRepository;
+        $this->linkRepository = $linkRepository;
     }
 
     #[Route('/upload', name: 'app_upload', methods: ['POST'])]
-    public function upload(Request $request, SluggerInterface $slugger, FlasherInterface $flasher, LoggerInterface $log): Response
+    public function upload(Request $request, SluggerInterface $slugger,
+                           FlasherInterface $flasher, LoggerInterface $log): Response
     {
         $file = $request->files->get('file');
 
@@ -66,19 +70,32 @@ class FileController extends AbstractController
         $newFileName = $safeFileName.'-'.uniqid().'.'.$file->guessExtension();
 
         try {
-            $file->move($this->getParameter('upload_directory'), $newFileName);
+            $file->move(
+                $this->getParameter('project_root')
+                .DIRECTORY_SEPARATOR
+                .$this->getParameter('upload_directory')
+                .DIRECTORY_SEPARATOR,
+                $newFileName);
 
-            $this->fileRepository->save(
+            $file = $this->fileRepository->save(
                 $newFileName,
-                $this->getParameter('upload_directory_folder_only') . '/' . $newFileName,
+                $this->getParameter('upload_directory') . DIRECTORY_SEPARATOR . $newFileName,
                 $fileSize,
                 new DateTime()
             );
 
+            $link = $this->linkRepository->save($file);
+            $token = $link->getToken();
+
             $flasher
                 ->option('position', 'top-left')
                 ->success('File uploaded and saved to the database successfully.');
-
+            $flasher
+                ->options([
+                    'position' => 'top-left',
+                    'timeout' => 60000
+                ])
+                ->info(sprintf('%s/%s', 'http://127.0.0.1:8000/link', $token));
             return $this->redirectToRoute('app_root');
         } catch (Exception $e) {
             $log->error($e->getMessage());
