@@ -17,10 +17,20 @@
                      src="" alt="Uploaded Image"
                      style="max-width: 50%; height: auto; margin-left: auto; margin-right: auto">
             </div>
-            <a href="{{ path('app_root') }}"
-               class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none">
-                Go Back
-            </a>
+            <div class="flex justify-center text-center">
+                <a href="{{ path('app_root') }}"
+                   class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 mr-2 rounded-lg focus:outline-none">
+                    Go Back
+                </a>
+                <a href=""
+                   data-controller="image-loader"
+                   data-image-loader-token-value="{{ token }}"
+                   data-image-loader-image-url-value="{{ path('app_serve_file', {'token': token}) }}"
+                   class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none"
+                   download>
+                    Download
+                </a>
+            </div>
         </div>
     </div>
 </div>

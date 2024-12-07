@@ -24,9 +24,13 @@ export default class extends Controller {
             }
 
             const blob = await response.blob();
-            const objectUrl = URL.createObjectURL(blob);
+            const imageUrl = URL.createObjectURL(blob)
 
-            this.element.src = objectUrl;
+            if (this.element.src) {
+                this.element.src = imageUrl;
+            } else {
+                this.element.href = imageUrl;
+            }
         } catch (error) {
             console.error(error);
         }
