@@ -8,28 +8,50 @@
          style="background-image: url('https://picsum.photos/1920/1080');">
     </div>
     <div class="relative flex justify-center items-center min-h-screen">
-        <div class="bg-white rounded-lg shadow-lg p-8">
+        <div class="bg-white rounded-lg shadow-lg p-8" style="width: 75%;">
             <div class="mb-6">
-                <img id="uploaded-image"
-                     data-controller="image-loader"
-                     data-image-loader-token-value="{{ token }}"
-                     data-image-loader-image-url-value="{{ path('app_serve_file', {'token': token}) }}"
-                     src="" alt="Uploaded Image"
-                     style="max-width: 50%; height: auto; margin-left: auto; margin-right: auto">
+                {% if zipContents is defined and zipContents | length > 0 %}
+                    <h3 class="text-lg font-bold mb-4">ZIP File Contents:</h3>
+                    <div class="overflow-y-auto" style="max-height: 400px">
+                        <ul class="divide-y divide-gray-200">
+                            {% for file in zipContents %}
+                                <li class="flex items-center gap-2 px-4 py-2">
+                                    <span class="text-gray-500"><i class="fas fa-file"></i></span>
+                                    <span class="truncate">{{ file }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% else %}
+                    <img id="uploaded-image"
+                         data-controller="image-loader"
+                         data-image-loader-token-value="{{ token }}"
+                         data-image-loader-image-url-value="{{ path('app_serve_file', {'token': token}) }}"
+                         src="" alt="Uploaded Image"
+                         style="max-width: 50%; height: auto; margin-left: auto; margin-right: auto">
+                {% endif %}
             </div>
             <div class="flex justify-center text-center">
                 <a href="{{ path('app_root') }}"
                    class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 mr-2 rounded-lg focus:outline-none">
                     Go Back
                 </a>
-                <a href=""
-                   data-controller="image-loader"
-                   data-image-loader-token-value="{{ token }}"
-                   data-image-loader-image-url-value="{{ path('app_serve_file', {'token': token}) }}"
-                   class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none"
-                   download>
-                    Download
-                </a>
+                {% if zipContents is defined and zipContents | length > 0 %}
+                    <a href="{{ path('app_serve_file', {'token': token}) }}"
+                       class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none"
+                       download="{{ fileName }}">
+                        Download
+                    </a>
+                {% else %}
+                    <a href=""
+                       data-controller="image-loader"
+                       data-image-loader-token-value="{{ token }}"
+                       data-image-loader-image-url-value="{{ path('app_serve_file', {'token': token}) }}"
+                       class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none"
+                       download>
+                        Download
+                    </a>
+                {% endif %}
             </div>
         </div>
     </div>

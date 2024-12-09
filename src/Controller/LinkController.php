@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\LinkRepository;
 use Flasher\Prime\FlasherInterface;
+use HttpException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -45,14 +46,35 @@ class LinkController extends AbstractController
         }
 
         $filePath = $this->getParameter('project_root') . DIRECTORY_SEPARATOR . $file->getFilePath();
-        $logger->emergency($filePath);
         if (!file_exists($filePath)) {
             throw $this->createNotFoundException('File does not exist.');
         }
 
+        $fileName = $file->getFileName();
+        $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
+
+        if (strtolower($fileExtension) === 'zip') {
+            $zipContents = [];
+            $zip = new \ZipArchive();
+            if ($zip->open($filePath) === true) {
+                for ($i = 0; $i < $zip->numFiles; $i++) {
+                    $zipContents[] = $zip->getNameIndex($i);
+                }
+                $zip->close();
+            } else {
+                throw new HttpException(500, 'Unable to open ZIP file.');
+            }
+
+            return $this->render('link/view.html.twig', [
+                'token' => $token,
+                'fileName' => $file->getFileName(),
+                'zipContents' => $zipContents,
+            ]);
+        }
+
         return $this->render('link/view.html.twig', [
             'token' => $token,
-            'fileName' => $file->getFileName(),
+            'fileName' => $file->getFileName()
         ]);
     }
 
