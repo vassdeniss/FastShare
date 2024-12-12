@@ -35,6 +35,8 @@ class LinkController extends AbstractController
     #[Route('/{token}', name: 'app_view_file', methods: ['GET'])]
     public function viewFile(string $token, LoggerInterface $logger): Response
     {
+        $parameters = [];
+
         $link = $this->linkRepository->findOneByToken($token);
         if (!$link) {
             throw $this->createNotFoundException('Link not found or expired.');
@@ -65,17 +67,15 @@ class LinkController extends AbstractController
                 throw new HttpException(500, 'Unable to open ZIP file.');
             }
 
-            return $this->render('link/view.html.twig', [
-                'token' => $token,
-                'fileName' => $file->getFileName(),
-                'zipContents' => $zipContents,
-            ]);
+            $parameters['zipContents'] = $zipContents;
         }
 
-        return $this->render('link/view.html.twig', [
-            'token' => $token,
-            'fileName' => $file->getFileName()
-        ]);
+        $parameters['token'] = $token;
+        $parameters['mime'] = $file->getMimeType();
+        $parameters['path'] = $filePath;
+        $parameters['fileName'] = $file->getFileName();
+
+        return $this->render('link/view.html.twig', $parameters);
     }
 
     /**
@@ -87,7 +87,7 @@ class LinkController extends AbstractController
      *
      * @throws NotFoundHttpException If the link or file is not found.
      */
-    #[Route('/serve/{token}', name: 'app_serve_file', methods: ['Post'])]
+    #[Route('/serve/{token}', name: 'app_serve_file', methods: ['GET', 'POST'])]
     public function serveFile(string $token): BinaryFileResponse
     {
         $link = $this->linkRepository->findOneByToken($token);

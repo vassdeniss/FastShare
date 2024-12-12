@@ -42,6 +42,7 @@ class FileController extends AbstractController
         $allowedMimeTypes = [
             'image/jpeg', 'image/png', 'image/gif',
             'video/mp4', 'video/mpeg', 'video/quicktime',
+            'audio/mpeg', 'audio/wav', 'audio/ogg',
             'application/zip', 'application/x-zip-compressed', 'application/octet-stream'
         ];
 
@@ -55,8 +56,6 @@ class FileController extends AbstractController
         // Magic number: 1.5gb into bytes
         $maxFileSize = 1.5e+9;
         $fileSize = $file->getSize();
-        $log->info($maxFileSize);
-        $log->info($file->getSize());
 
         if ($fileSize > $maxFileSize) {
             $flasher
@@ -68,6 +67,7 @@ class FileController extends AbstractController
         $originalFileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $safeFileName = $slugger->slug($originalFileName);
         $newFileName = $safeFileName.'-'.uniqid().'.'.$file->guessExtension();
+        $mimeType = $file->getMimeType();
 
         try {
             $file->move(
@@ -81,7 +81,8 @@ class FileController extends AbstractController
                 $newFileName,
                 $this->getParameter('upload_directory') . DIRECTORY_SEPARATOR . $newFileName,
                 $fileSize,
-                new DateTime()
+                new DateTime(),
+                $mimeType
             );
 
             $link = $this->linkRepository->save($file);

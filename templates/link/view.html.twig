@@ -10,7 +10,15 @@
     <div class="relative flex justify-center items-center min-h-screen">
         <div class="bg-white rounded-lg shadow-lg p-8" style="width: 75%;">
             <div class="mb-6">
-                {% if zipContents is defined and zipContents | length > 0 %}
+                {% if mime starts with 'audio' %}
+                    <div class="flex justify-center items-center gap-2 flex-col">
+                        <p>{{ fileName }}</p>
+                        <audio controls>
+                            <source src="{{ path('app_serve_file', {'token': token}) }}" type="{{ mime }}">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                {% elseif zipContents is defined and zipContents | length > 0 %}
                     <h3 class="text-lg font-bold mb-4">ZIP File Contents:</h3>
                     <div class="overflow-y-auto" style="max-height: 400px">
                         <ul class="divide-y divide-gray-200">
@@ -24,10 +32,7 @@
                     </div>
                 {% else %}
                     <img id="uploaded-image"
-                         data-controller="image-loader"
-                         data-image-loader-token-value="{{ token }}"
-                         data-image-loader-image-url-value="{{ path('app_serve_file', {'token': token}) }}"
-                         src="" alt="Uploaded Image"
+                         src="{{ path('app_serve_file', {'token': token}) }}" alt="Uploaded Image"
                          style="max-width: 50%; height: auto; margin-left: auto; margin-right: auto">
                 {% endif %}
             </div>
@@ -36,22 +41,11 @@
                    class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 mr-2 rounded-lg focus:outline-none">
                     Go Back
                 </a>
-                {% if zipContents is defined and zipContents | length > 0 %}
-                    <a href="{{ path('app_serve_file', {'token': token}) }}"
-                       class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none"
-                       download="{{ fileName }}">
-                        Download
-                    </a>
-                {% else %}
-                    <a href=""
-                       data-controller="image-loader"
-                       data-image-loader-token-value="{{ token }}"
-                       data-image-loader-image-url-value="{{ path('app_serve_file', {'token': token}) }}"
-                       class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none"
-                       download>
-                        Download
-                    </a>
-                {% endif %}
+                <a href="{{ path('app_serve_file', {'token': token}) }}"
+                   class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none"
+                   download="{{ fileName }}">
+                    Download
+                </a>
             </div>
         </div>
     </div>

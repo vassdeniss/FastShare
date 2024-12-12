@@ -41,14 +41,15 @@ class FileRepository extends ServiceEntityRepository
      * @return File The newly created File entity.
      */
     public function save(string $fileName, string $filePath, int $fileSize,
-                         DateTimeInterface $uploadDate): File
+                         DateTimeInterface $uploadDate, string $mimeType): File
     {
         $fileEntity = new File();
         $fileEntity
             ->setFileName($fileName)
             ->setFilePath($filePath)
             ->setFileSize($fileSize)
-            ->setUploadDate($uploadDate);
+            ->setUploadDate($uploadDate)
+            ->setMimeType($mimeType);
 
         $this->em->persist($fileEntity);
         $this->em->flush();

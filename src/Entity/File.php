@@ -33,6 +33,9 @@ class File
     #[ORM\Column]
     private int $downloadCount = 0;
 
+    #[ORM\Column]
+    private string $mimeType = '';
+
     #[ORM\OneToOne(targetEntity: Link::class, mappedBy: 'file')]
     private ?Link $link = null;
 
@@ -104,6 +107,18 @@ class File
     public function setDownloadCount(int $downloadCount): static
     {
         $this->downloadCount = $downloadCount;
+
+        return $this;
+    }
+
+    public function getMimeType(): string
+    {
+        return $this->mimeType;
+    }
+
+    public function setMimeType(string $mimeType): static
+    {
+        $this->mimeType = $mimeType;
 
         return $this;
     }
