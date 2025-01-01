@@ -28,13 +28,15 @@ class LinkRepository extends ServiceEntityRepository
      * Creates a new Link entity for the given File and persists it to the database.
      * @param File $file The File entity for which the link is being generated.
      * @return Link The newly created Link entity.
+     * @throws \DateMalformedStringException
      */
     public function save(File $file): Link
     {
         $link = new Link();
         $link->setFile($file);
         $link->setToken(Uuid::v4()->toRfc4122());
-        $link->setExpiresAt((new \DateTime())->modify('+24 hours'));
+        $link->setExpiresAt((new \DateTime())
+             ->modify('+24 hours'));
 
         $this->em->persist($link);
         $this->em->flush();
@@ -43,12 +45,8 @@ class LinkRepository extends ServiceEntityRepository
     }
 
     /**
-     * Finds a Link entity by its token.
-     *
-     * This method retrieves a single Link entity that matches the provided token.
-     *
+     * Retrieves a single Link entity that matches the provided token.
      * @param string $token The token associated with the Link.
-     *
      * @return Link|null The Link entity if found, or null if no matching Link is found.
      */
     public function findOneByToken(string $token): ?Link

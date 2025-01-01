@@ -15,29 +15,21 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class FileRepository extends ServiceEntityRepository
 {
-    /**
-     * @var EntityManagerInterface The entity manager used to persist and flush data.
-     */
     private EntityManagerInterface $em;
 
     public function __construct(ManagerRegistry $registry, EntityManagerInterface $em)
     {
         parent::__construct($registry, File::class);
-
         $this->em = $em;
     }
 
     /**
      * Saves a new File entity to the database.
-     *
-     * This method creates a new File entity, sets its properties, and persists it
-     * to the database. It then flushes the changes to ensure the entity is stored.
-     *
      * @param string $fileName The name of the file being saved.
      * @param string $filePath The file's storage path.
      * @param int $fileSize The size of the file in bytes.
      * @param DateTimeInterface $uploadDate The date and time when the file was uploaded.
-     *
+     * @param string $mimeType The MIME of the uploaded file.
      * @return File The newly created File entity.
      */
     public function save(string $fileName, string $filePath, int $fileSize,
