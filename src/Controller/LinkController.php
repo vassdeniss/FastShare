@@ -2,111 +2,76 @@
 
 namespace App\Controller;
 
-use App\Repository\LinkRepository;
-use Flasher\Prime\FlasherInterface;
+use App\Service\LinkFileService;
 use HttpException;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/link')]
 class LinkController extends AbstractController
 {
-    private LinkRepository $linkRepository;
+    private LinkFileService $linkFileService;
 
-    public function __construct(LinkRepository $linkRepository) {
-        $this->linkRepository = $linkRepository;
+    public function __construct(LinkFileService $linkFileService)
+    {
+        $this->linkFileService = $linkFileService;
     }
 
     /**
      * Renders the Twig view to display the file.
-     *
      * @param string $token The token associated with the file.
-     *
      * @return Response The rendered Twig template.
-     *
-     * @throws NotFoundHttpException If the link or file is not found or invalid.
+     * @throws HttpException If the zip file cannot be opened.
      */
     #[Route('/{token}', name: 'app_view_file', methods: ['GET'])]
-    public function viewFile(string $token, LoggerInterface $logger): Response
+    public function viewFile(string $token): Response
     {
-        $parameters = [];
+        // 1) Retrieve Link and File
+        $link     = $this->linkFileService->getLinkByToken($token);
+        $file     = $this->linkFileService->getFileFromLink($link);
+        $filePath = $this->linkFileService->getAbsoluteFilePath(
+            $file,
+            $this->getParameter('project_root')
+        );
 
-        $link = $this->linkRepository->findOneByToken($token);
-        if (!$link) {
-            throw $this->createNotFoundException('Link not found or expired.');
+        // 2) If it's a ZIP, get contents
+        $parameters = [
+            'token'    => $token,
+            'mime'     => $file->getMimeType(),
+            'path'     => $filePath,
+            'fileName' => $file->getFileName(),
+        ];
+
+        if ($this->linkFileService->isZipFile($file->getFileName())) {
+            $parameters['zipContents'] = $this->linkFileService->getZipContents($filePath);
         }
 
-        $file = $link->getFile();
-        if (!$file) {
-            throw $this->createNotFoundException('File not found.');
-        }
-
-        $filePath = $this->getParameter('project_root') . DIRECTORY_SEPARATOR . $file->getFilePath();
-        if (!file_exists($filePath)) {
-            throw $this->createNotFoundException('File does not exist.');
-        }
-
-        $fileName = $file->getFileName();
-        $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
-
-        if (strtolower($fileExtension) === 'zip') {
-            $zipContents = [];
-            $zip = new \ZipArchive();
-            if ($zip->open($filePath) === true) {
-                for ($i = 0; $i < $zip->numFiles; $i++) {
-                    $zipContents[] = $zip->getNameIndex($i);
-                }
-                $zip->close();
-            } else {
-                throw new HttpException(500, 'Unable to open ZIP file.');
-            }
-
-            $parameters['zipContents'] = $zipContents;
-        }
-
-        $parameters['token'] = $token;
-        $parameters['mime'] = $file->getMimeType();
-        $parameters['path'] = $filePath;
-        $parameters['fileName'] = $file->getFileName();
-
+        // 3) Render the template
         return $this->render('link/view.html.twig', $parameters);
     }
 
     /**
      * Serves the image file securely.
-     *
      * @param string $token The token associated with the file.
-     *
      * @return BinaryFileResponse The response streaming the image file.
-     *
-     * @throws NotFoundHttpException If the link or file is not found.
      */
     #[Route('/serve/{token}', name: 'app_serve_file', methods: ['GET', 'POST'])]
     public function serveFile(string $token): BinaryFileResponse
     {
-        $link = $this->linkRepository->findOneByToken($token);
-        if (!$link) {
-            throw $this->createNotFoundException('Link not found or expired.');
-        }
+        // 1) Retrieve Link and File
+        $link     = $this->linkFileService->getLinkByToken($token);
+        $file     = $this->linkFileService->getFileFromLink($link);
+        $filePath = $this->linkFileService->getAbsoluteFilePath(
+            $file,
+            $this->getParameter('project_root')
+        );
 
-        $file = $link->getFile();
-        if (!$file) {
-            throw $this->createNotFoundException('File not found.');
-        }
-
-        $filePath = $this->getParameter('project_root') . DIRECTORY_SEPARATOR . $file->getFilePath();
-        if (!file_exists($filePath)) {
-            throw $this->createNotFoundException('File does not exist.');
-        }
-
+        // 2) Build the BinaryFileResponse
         $response = new BinaryFileResponse($filePath);
-        // $response->headers->set('Content-Type', $file->getMimeType());
+        $response->headers->set('Content-Type', $file->getMimeType());
         $response->setContentDisposition(
             ResponseHeaderBag::DISPOSITION_INLINE,
             $file->getFileName()
