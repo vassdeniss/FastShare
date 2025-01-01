@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f6f28d6d93fd8f2aa349b223430c9007",
+    "content-hash": "aa57af275a97542fd37a1dd396363ea9",
     "packages": [
         {
             "name": "composer/semver",
@@ -10155,6 +10155,60 @@
                 }
             ],
             "time": "2024-11-19T10:11:44+00:00"
+        },
+        {
+            "name": "testcontainers/testcontainers",
+            "version": "0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/testcontainers/testcontainers-php.git",
+                "reference": "68a2d6d47c0116e1237b575a7f5a08864aa23f90"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/testcontainers/testcontainers-php/zipball/68a2d6d47c0116e1237b575a7f5a08864aa23f90",
+                "reference": "68a2d6d47c0116e1237b575a7f5a08864aa23f90",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">= 8.1",
+                "symfony/process": "^5.0|^6.0|^7.0"
+            },
+            "require-dev": {
+                "brianium/paratest": "^6.6",
+                "friendsofphp/php-cs-fixer": "^3.12",
+                "phpstan/extension-installer": "^1.2",
+                "phpstan/phpstan": "^1.8",
+                "phpstan/phpstan-phpunit": "^1.1",
+                "phpunit/phpunit": "^9.5",
+                "predis/predis": "^3.0 || ^2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Testcontainers\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Soner Sayakci",
+                    "email": "github@shyim.de"
+                }
+            ],
+            "description": "Testcontainers implementation in PHP",
+            "keywords": [
+                "docker",
+                "testcontainers"
+            ],
+            "support": {
+                "issues": "https://github.com/testcontainers/testcontainers-php/issues",
+                "source": "https://github.com/testcontainers/testcontainers-php/tree/0.2.0"
+            },
+            "time": "2024-08-05T19:35:10+00:00"
         },
         {
             "name": "theseer/tokenizer",
