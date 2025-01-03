@@ -18,6 +18,14 @@
                             Your browser does not support the audio element.
                         </audio>
                     </div>
+                {% elseif mime starts with 'video' %}
+                    <div class="flex justify-center items-center gap-2 flex-col">
+                        <p>{{ fileName }}</p>
+                        <video controls style="max-width: 100%; height: auto;">
+                            <source src="{{ path('app_serve_file', {'token': token}) }}" type="{{ mime }}">
+                            Your browser does not support the video element.
+                        </video>
+                    </div>
                 {% elseif zipContents is defined and zipContents | length > 0 %}
                     <h3 class="text-lg font-bold mb-4">ZIP File Contents:</h3>
                     <div class="overflow-y-auto" style="max-height: 400px">
