@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\File;
 use App\Entity\Link;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -52,5 +53,19 @@ class LinkRepository extends ServiceEntityRepository
     public function findOneByToken(string $token): ?Link
     {
         return $this->findOneBy(['token' => $token]);
+    }
+
+    /**
+     * Finds all expired links based on the current date and time.
+     * @param DateTime $now The current date and time used to filter expired links.
+     * @return Link[] Returns an array of expired `Link` entities.
+     */
+    public function findExpiredLinks(DateTime $now): array
+    {
+        return $this->createQueryBuilder('l')
+            ->andWhere('l.expiresAt <= :now')
+            ->setParameter('now', $now)
+            ->getQuery()
+            ->getResult();
     }
 }

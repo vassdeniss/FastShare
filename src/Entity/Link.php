@@ -22,7 +22,7 @@ class Link
     private ?string $token = null;
 
     #[ORM\OneToOne(targetEntity: File::class, inversedBy: 'link')]
-    #[JoinColumn(name: 'file_id', referencedColumnName: 'id')]
+    #[JoinColumn(name: 'file_id', referencedColumnName: 'id', onDelete: 'CASCADE' )]
     private ?File $file = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]

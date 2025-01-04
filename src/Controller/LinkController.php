@@ -54,9 +54,9 @@ class LinkController extends AbstractController
     }
 
     /**
-     * Serves the image file securely.
+     * Serves the given file.
      * @param string $token The token associated with the file.
-     * @return BinaryFileResponse The response streaming the image file.
+     * @return BinaryFileResponse The response streaming the file.
      */
     #[Route('/serve/{token}', name: 'app_serve_file', methods: ['GET', 'POST'])]
     public function serveFile(string $token): BinaryFileResponse

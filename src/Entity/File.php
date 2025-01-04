@@ -36,7 +36,7 @@ class File
     #[ORM\Column]
     private string $mimeType = '';
 
-    #[ORM\OneToOne(targetEntity: Link::class, mappedBy: 'file')]
+    #[ORM\OneToOne(targetEntity: Link::class, mappedBy: 'file', cascade: ['remove'])]
     private ?Link $link = null;
 
     public function getId(): ?Uuid
