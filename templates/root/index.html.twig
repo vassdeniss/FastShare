@@ -10,10 +10,10 @@
         <div class="absolute inset-0 bg-cover bg-center blur"
              style="background-image: url('https://picsum.photos/1920/1080');">
         </div>
-        <div class="absolute w-1/2 inset-0 bg-white flex items-center justify-start" style="clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 0% 100%);">
+        <div class="dark:bg-gray-700  absolute w-1/2 inset-0 bg-white flex items-center justify-start" style="clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 0% 100%);">
             <div class="p-8 h-full content-center">
-                <h1 class="text-4xl font-bold mb-6">Upload Your File</h1>
-                <p class="text-gray-700 mb-4">
+                <h1 class="text-4xl font-bold mb-6 dark:text-white">Upload Your File</h1>
+                <p class="text-gray-700 mb-4 dark:text-white">
                     Share files quickly and securely. Fill out the form below to get started.
                 </p>
                 <form
@@ -23,25 +23,28 @@
                         class="space-y-6"
                 >
                     <div>
-                        <label for="file" class="block text-sm font-medium text-gray-700">Select File (Max 1.5GB)</label>
+                        <label for="file" class="block text-sm font-medium text-gray-700 dark:text-white">Select File (Max 1.5GB)</label>
                         <input
                                 type="file"
                                 id="file"
                                 name="file"
                                 accept=".jpeg, .jpg, .png, .gif, .mp4, .mpeg, .mov, .zip, .mp3, .wav, .ogg"
-                                class="mt-2 block w-full text-sm border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-amber-600"
+                                class="mt-2 block w-full text-sm border border-gray-300 rounded-lg bg-gray-50 focus:outline-none dark:focus:ring-purple-600 focus:ring-2 focus:ring-amber-600"
                                 required
                         />
-                        <p class="mt-1 text-xs text-gray-500">
+                        <p class="mt-1 text-xs text-gray-500 dark:text-white">
                             Supported file types: Images (JPEG, PNG, GIF), Videos (MP4, MPEG, QuickTime), Audio (MP3, WAV, OGG) and ZIP files.
                         </p>
                     </div>
                     <button
                             data-action="click->spinner#show"
                             type="submit"
-                            class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none"
+                            class="w-full dark:bg-purple-600 bg-amber-600 dark:hover:bg-purple-700 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none"
                     >
                         Upload
+                    </button>
+                    <button id="darkModeToggle" class="w-150 dark:bg-purple-600 bg-amber-600 dark:hover:bg-purple-700 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none">
+                        Toggle Dark Mode
                     </button>
                 </form>
             </div>
