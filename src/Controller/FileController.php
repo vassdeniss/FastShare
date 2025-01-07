@@ -24,7 +24,12 @@ class FileController extends AbstractController
     #[Route('/upload', name: 'app_upload', methods: ['POST'])]
     public function upload(Request $request, FlasherInterface $flasher, LoggerInterface $log): Response
     {
-        $uploadedFile  = $request->files->get('file');
+        $uploadedFile = $request->files->get('file');
+        $rawPassword = null;
+
+        if ($request->request->get('enablePassword')) {
+            $rawPassword = $request->request->get('password');
+        }
 
         // 1) Check if a file was actually uploaded
         if (!$uploadedFile) {
@@ -39,7 +44,8 @@ class FileController extends AbstractController
             $result = $this->fileUploadService->uploadFile(
                 $uploadedFile,
                 $this->getParameter('project_root'),
-                $this->getParameter('upload_directory')
+                $this->getParameter('upload_directory'),
+                $rawPassword
             );
 
             // 3) Flash a success message

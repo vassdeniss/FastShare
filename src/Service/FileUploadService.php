@@ -58,7 +58,8 @@ class FileUploadService
     public function uploadFile(
         UploadedFile $file,
         string $projectRoot,
-        string $uploadDirectory
+        string $uploadDirectory,
+        ?string $rawPassword = null
     ): array {
         // 1) Validate the file
         $this->validateFile($file);
@@ -86,7 +87,7 @@ class FileUploadService
         );
 
         // 5) Generate a link and save
-        $linkEntity = $this->linkRepository->save($fileEntity);
+        $linkEntity = $this->linkRepository->save($fileEntity, $rawPassword);
 
         return [
             'token'    => $linkEntity->getToken(),

@@ -31,13 +31,17 @@ class LinkRepository extends ServiceEntityRepository
      * @return Link The newly created Link entity.
      * @throws \DateMalformedStringException
      */
-    public function save(File $file): Link
+    public function save(File $file, ?string $rawPassword): Link
     {
         $link = new Link();
         $link->setFile($file);
         $link->setToken(Uuid::v4()->toRfc4122());
-        $link->setExpiresAt((new \DateTime())
-             ->modify('+24 hours'));
+        $link->setExpiresAt((new DateTime())->modify('+24 hours'));
+
+        if (!empty($rawPassword)) {
+            $hashedPassword = password_hash($rawPassword, PASSWORD_BCRYPT);
+            $link->setPassword($hashedPassword);
+        }
 
         $this->em->persist($link);
         $this->em->flush();

@@ -28,6 +28,9 @@ class Link
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $expiresAt = null;
 
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    private ?string $password = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -72,6 +75,18 @@ class Link
     public function setExpiresAt(\DateTimeInterface $expiresAt): static
     {
         $this->expiresAt = $expiresAt;
+
+        return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(?string $password): static
+    {
+        $this->password = $password;
 
         return $this;
     }

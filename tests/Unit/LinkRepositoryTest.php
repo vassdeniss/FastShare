@@ -37,7 +37,7 @@ class LinkRepositoryTest extends TestCase
             ->method('flush');
 
         // Act: Call the method under test
-        $linkRepository->save($file);
+        $linkRepository->save($file, null);
 
         // Assert: (Implicit in mock expectations)
         // Verify that the persist and flush methods were called as expected.

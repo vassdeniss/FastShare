@@ -36,6 +36,27 @@
                             Supported file types: Images (JPEG, PNG, GIF), Videos (MP4, MPEG, QuickTime), Audio (MP3, WAV, OGG) and ZIP files.
                         </p>
                     </div>
+                    <div>
+                        <input
+                                type="checkbox"
+                                id="enablePassword"
+                                name="enablePassword"
+                                class="mr-2"
+                                onclick="togglePasswordField()"
+                        />
+                        <label for="enablePassword" class="text-sm font-medium text-gray-700 dark:text-white">
+                            Protect this file with a password
+                        </label>
+                    </div>
+                    <div id="passwordField" class="mt-4" style="display: none;">
+                        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-white">Enter Password</label>
+                        <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="mt-2 block w-full text-sm border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 dark:focus:ring-purple-600 focus:ring-amber-600"
+                        />
+                    </div>
                     <button
                             data-action="click->spinner#show"
                             type="submit"
@@ -51,4 +72,22 @@
         </div>
     </div>
 </div>
+<script>
+    function togglePasswordField() {
+        const checkBox = document.getElementById('enablePassword');
+        const passwordField = document.getElementById('passwordField');
+        passwordField.style.display = checkBox.checked ? 'block' : 'none';
+    }
+
+    document.getElementById('darkModeToggle').addEventListener('click', () => {
+        const html = document.documentElement;
+        if (html.classList.contains('dark')) {
+            html.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        } else {
+            html.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+</script>
 {% endblock %}

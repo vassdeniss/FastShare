@@ -40,7 +40,7 @@ class LinkRepositoryInMemoryTest extends KernelTestCase
         $this->entityManager->flush();
 
         // Act: create & save a Link
-        $link = $linkRepository->save($file);
+        $link = $linkRepository->save($file, null);
 
         // Assert: can be fetched back from the DB
         $savedLink = $linkRepository->find($link->getId());
@@ -60,7 +60,7 @@ class LinkRepositoryInMemoryTest extends KernelTestCase
         $this->entityManager->flush();
 
         // Act: create & save a Link
-        $link = $linkRepository->save($file);
+        $link = $linkRepository->save($file, null);
 
         // Assert: can be fetched back from the DB
         $savedLink = $linkRepository->find($link->getId());
