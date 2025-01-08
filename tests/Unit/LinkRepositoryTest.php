@@ -6,6 +6,7 @@ use App\Entity\File;
 use App\Entity\Link;
 use App\Repository\FileRepository;
 use App\Repository\LinkRepository;
+use App\Tests\Creator;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -21,8 +22,12 @@ class LinkRepositoryTest extends TestCase
         $managerRegistry->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($entityManager);
-        $linkRepository = new LinkRepository($managerRegistry, $entityManager);
-        $file = new File();
+        $fileRepository = $this->createMock(FileRepository::class);
+        $file = Creator::createFile("test.txt");
+        $fileRepository->expects($this->any())
+            ->method('find')
+            ->willReturn($file);
+        $linkRepository = new LinkRepository($managerRegistry, $entityManager, $fileRepository);
 
         // Set up expectations for the mocked EntityManager
         // 1. The persist method should be called once with a File entity.
@@ -37,7 +42,7 @@ class LinkRepositoryTest extends TestCase
             ->method('flush');
 
         // Act: Call the method under test
-        $linkRepository->save($file, null);
+        $linkRepository->save($file->getId(), null);
 
         // Assert: (Implicit in mock expectations)
         // Verify that the persist and flush methods were called as expected.
@@ -52,11 +57,12 @@ class LinkRepositoryTest extends TestCase
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $fileRepository = $this->createMock(FileRepository::class);
         $managerRegistry->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($entityManager);
         $linkRepository = $this->getMockBuilder(LinkRepository::class)
-            ->setConstructorArgs([$managerRegistry, $entityManager])
+            ->setConstructorArgs([$managerRegistry, $entityManager, $fileRepository])
             ->onlyMethods(['findOneBy'])
             ->getMock();
         $linkRepository->expects($this->once())

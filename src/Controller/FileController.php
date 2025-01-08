@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Service\FileUploadService;
+use App\Service\FileService;
 use Exception;
 use Flasher\Prime\FlasherInterface;
 use Psr\Log\LoggerInterface;
@@ -14,13 +14,22 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/file')]
 class FileController extends AbstractController
 {
-    private FileUploadService $fileUploadService;
+    private FileService $fileUploadService;
 
-    public function __construct(FileUploadService $fileUploadService)
+    public function __construct(FileService $fileUploadService)
     {
         $this->fileUploadService = $fileUploadService;
     }
 
+    /**
+     * Uploads a file, handles password protection, and flashes status messages.
+     *
+     * @param Request          $request The incoming request containing file data.
+     * @param FlasherInterface $flasher The flash messaging service.
+     * @param LoggerInterface  $log     The logger service for error tracking.
+     *
+     * @return Response A redirect to the homepage or wherever you handle next.
+     */
     #[Route('/upload', name: 'app_upload', methods: ['POST'])]
     public function upload(Request $request, FlasherInterface $flasher, LoggerInterface $log): Response
     {

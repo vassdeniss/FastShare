@@ -46,7 +46,7 @@ class FileRepositoryInMemoryTest extends KernelTestCase
 
         // Assert: can be fetched back from the DB
         $savedFile = $this->entityManager->getRepository(File::class)
-            ->find($file->getId());
+            ->find($file);
 
         $this->assertNotNull($savedFile);
         $this->assertSame('test-file.txt', $savedFile->getFileName());

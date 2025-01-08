@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Dto\LinkDto;
+use App\Service\FileService;
 use App\Service\LinkFileService;
 use Flasher\Prime\FlasherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,12 +19,22 @@ use Symfony\Component\Routing\Attribute\Route;
 class LinkController extends AbstractController
 {
     private LinkFileService $linkFileService;
+    private FileService $fileService;
 
-    public function __construct(LinkFileService $linkFileService)
+    public function __construct(LinkFileService $linkFileService, FileService $fileService)
     {
         $this->linkFileService = $linkFileService;
+        $this->fileService = $fileService;
     }
 
+    /**
+     * Displays a file referenced by a link token, optionally requesting a password.
+     *
+     * @param string           $token   The link token.
+     * @param SessionInterface $session The user session.
+     *
+     * @return Response The rendered view or password form.
+     */
     #[Route('/{token}', name: 'app_view_file', methods: ['GET'])]
     public function viewFile(
         string $token,
@@ -47,6 +59,16 @@ class LinkController extends AbstractController
         ]);
     }
 
+    /**
+     * Validates a user-entered password for a protected link.
+     *
+     * @param string           $token   The link token.
+     * @param Request          $request The current request.
+     * @param SessionInterface $session The user session.
+     * @param FlasherInterface $flasher The flash message service.
+     *
+     * @return RedirectResponse Redirects to the file view route on success or error.
+     */
     #[Route('/check-password/{token}', name: 'app_check_password', methods: ['POST'])]
     public function checkPassword(
         string $token,
@@ -81,47 +103,31 @@ class LinkController extends AbstractController
         return $this->redirectToRoute('app_view_file', ['token' => $token]);
     }
 
-    private function renderFileView($link): Response
-    {
-        $file = $this->linkFileService->getFileFromLink($link);
-        $filePath = $this->linkFileService->getAbsoluteFilePath(
-            $file,
-            $this->getParameter('project_root')
-        );
-
-        $parameters = [
-            'token'    => $link->getToken(),
-            'mime'     => $file->getMimeType(),
-            'path'     => $filePath,
-            'fileName' => $file->getFileName(),
-        ];
-
-        if ($this->linkFileService->isZipFile($file->getFileName())) {
-            $parameters['zipContents'] = $this->linkFileService->getZipContents($filePath);
-        }
-
-        return $this->render('link/view.html.twig', $parameters);
-    }
-
     /**
-     * Serves the given file.
-     * @param string $token The token associated with the file.
-     * @return BinaryFileResponse The response streaming the file.
+     * Serves the file as a downloadable or inline response.
+     *
+     * @param Request $request The current request (to check query params).
+     * @param string  $token   The link token referencing the file.
+     *
+     * @return BinaryFileResponse The streamed file response.
      */
     #[Route('/serve/{token}', name: 'app_serve_file', methods: ['GET', 'POST'])]
-    public function serveFile(string $token): BinaryFileResponse
+    public function serveFile(Request $request, string $token): BinaryFileResponse
     {
         // 1) Retrieve Link and File
         $link     = $this->linkFileService->getLinkByToken($token);
         $file     = $this->linkFileService->getFileFromLink($link);
         $filePath = $this->linkFileService->getAbsoluteFilePath(
-            $file,
+            $file->getFilePath(),
             $this->getParameter('project_root')
         );
 
         // 2) update download count
-        $file->setDownloadCount($file->getDownloadCount() + 1);
-
+        $isDownloaded = $request->query->getBoolean('isDownloaded');
+        if ($isDownloaded) {
+            $file->setDownloadCount($file->getDownloadCount() + 1);
+            $this->fileService->updateFile($file->getId(), downloadCount: $file->getDownloadCount());
+        }
 
         // 3) Build the BinaryFileResponse
         $response = new BinaryFileResponse($filePath);
@@ -132,5 +138,34 @@ class LinkController extends AbstractController
         );
 
         return $response;
+    }
+
+    /**
+     * Renders the file view page.
+     *
+     * @param LinkDto $link The Link DTO.
+     *
+     * @return Response A rendered twig template containing file details.
+     */
+    private function renderFileView(LinkDto $link): Response
+    {
+        $file = $this->linkFileService->getFileFromLink($link);
+        $filePath = $this->linkFileService->getAbsoluteFilePath(
+            $file->getFilePath(),
+            $this->getParameter('project_root'));
+
+        $parameters = [
+            'token'    => $link->getToken(),
+            'mime'     => $file->getMimeType(),
+            'path'     => $filePath,
+            'fileName' => $file->getFileName(),
+            'downloads' => $file->getDownloadCount()
+        ];
+
+        if ($this->linkFileService->isZipFile($file->getFileName())) {
+            $parameters['zipContents'] = $this->linkFileService->getZipContents($filePath);
+        }
+
+        return $this->render('link/view.html.twig', $parameters);
     }
 }

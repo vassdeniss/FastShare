@@ -2,8 +2,9 @@
 
 namespace App\Service;
 
-use App\Entity\File;
-use App\Entity\Link;
+use App\Dto\FileDto;
+use App\Dto\LinkDto;
+use App\Mapper\LinkMapper;
 use App\Repository\LinkRepository;
 use HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -19,24 +20,34 @@ class LinkFileService
     }
 
     /**
-     * Given a token, returns a validated Link entity.
-     * @throws NotFoundHttpException if the token is invalid or expired.
+     * Returns a validated Link DTO by token.
+     *
+     * @param string $token The link token.
+     *
+     * @throws NotFoundHttpException When the token is invalid or expired.
+     *
+     * @return LinkDto The corresponding Link DTO.
      */
-    public function getLinkByToken(string $token): Link
+    public function getLinkByToken(string $token): LinkDto
     {
         $link = $this->linkRepository->findOneByToken($token);
         if (!$link) {
             throw new NotFoundHttpException('Link not found or expired.');
         }
 
-        return $link;
+        return LinkMapper::entityToDto($link);
     }
 
     /**
-     * Given a Link entity, returns the associated File entity.
-     * @throws NotFoundHttpException if the file is missing.
+     * Retrieves the associated File DTO from a Link DTO.
+     *
+     * @param LinkDto $link The Link DTO.
+     *
+     * @throws NotFoundHttpException When the linked file is missing.
+     *
+     * @return FileDto The associated File DTO.
      */
-    public function getFileFromLink(Link $link): File
+    public function getFileFromLink(LinkDto $link): FileDto
     {
         $file = $link->getFile();
         if (!$file) {
@@ -47,12 +58,18 @@ class LinkFileService
     }
 
     /**
-     * Given a File entity and project root, returns the absolute file path.
-     * @throws NotFoundHttpException if the file is not present on disk.
+     * Builds the absolute file path for a given file path and project root.
+     *
+     * @param string $filePath    The relative file path.
+     * @param string $projectRoot The project root directory.
+     *
+     * @throws NotFoundHttpException When the file does not exist on disk.
+     *
+     * @return string The absolute file path.
      */
-    public function getAbsoluteFilePath(File $file, string $projectRoot): string
+    public function getAbsoluteFilePath(string $filePath, string $projectRoot): string
     {
-        $filePath = $projectRoot . DIRECTORY_SEPARATOR . $file->getFilePath();
+        $filePath = $projectRoot . DIRECTORY_SEPARATOR . $filePath;
 
         if (!file_exists($filePath)) {
             throw new NotFoundHttpException('File does not exist.');
@@ -62,7 +79,11 @@ class LinkFileService
     }
 
     /**
-     * Determines if a file name belongs to a ZIP archive.
+     * Checks if a file name represents a ZIP archive.
+     *
+     * @param string $fileName The file name to check.
+     *
+     * @return bool True if the file is a ZIP, false otherwise.
      */
     public function isZipFile(string $fileName): bool
     {
@@ -70,8 +91,13 @@ class LinkFileService
     }
 
     /**
-     * Returns an array of the file names inside a ZIP archive.
-     * @throws HttpException if we fail to open the ZIP.
+     * Retrieves the list of files inside a ZIP archive.
+     *
+     * @param string $zipPath The ZIP file path.
+     *
+     * @throws HttpException When the ZIP file cannot be opened.
+     *
+     * @return array An array of file names in the archive.
      */
     public function getZipContents(string $zipPath): array
     {
@@ -83,10 +109,9 @@ class LinkFileService
                 $zipContents[] = $zip->getNameIndex($i);
             }
             $zip->close();
-        } else {
-            throw new HttpException(500, 'Unable to open ZIP file.');
+            return $zipContents;
         }
 
-        return $zipContents;
+        throw new HttpException(500, 'Unable to open ZIP file.');
     }
 }
