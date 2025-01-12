@@ -5,9 +5,9 @@ namespace App\Entity;
 use App\Repository\FileRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\JoinColumn;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FileRepository::class)]
 class File
@@ -19,9 +19,12 @@ class File
     private ?Uuid $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "File name cannot be blank.")]
+    #[Assert\Length(max: 255, maxMessage: "File name must not exceed 255 characters.")]
     private ?string $fileName = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "File path cannot be blank.")]
     private ?string $filePath = null;
 
     #[ORM\Column]
