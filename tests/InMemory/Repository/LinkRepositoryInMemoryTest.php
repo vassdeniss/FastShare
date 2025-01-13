@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\InMemory;
+namespace App\Tests\InMemory\Repository;
 
 use App\Entity\Link;
 use App\Repository\LinkRepository;

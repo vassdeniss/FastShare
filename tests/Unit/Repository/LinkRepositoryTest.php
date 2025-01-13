@@ -1,13 +1,11 @@
 <?php
 
-namespace App\Tests\Unit;
+namespace App\Tests\Unit\Repository;
 
-use App\Entity\File;
 use App\Entity\Link;
 use App\Repository\FileRepository;
 use App\Repository\LinkRepository;
 use App\Tests\Creator;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;

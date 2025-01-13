@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Tests\Unit;
+namespace App\Tests\Unit\Repository;
 
-use App\Dto\FileDto;
 use App\Entity\File;
 use App\Repository\FileRepository;
 use DateTime;

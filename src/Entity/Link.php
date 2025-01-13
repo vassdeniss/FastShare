@@ -3,11 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\LinkRepository;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LinkRepository::class)]
 class Link
@@ -19,6 +21,7 @@ class Link
     private ?Uuid $id = null;
 
     #[ORM\Column(length: 255, unique: true)]
+    #[Assert\NotBlank(message: 'Token must not be blank.')]
     private ?string $token = null;
 
     #[ORM\OneToOne(targetEntity: File::class, inversedBy: 'link')]
@@ -26,7 +29,7 @@ class Link
     private ?File $file = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $expiresAt = null;
+    private ?DateTimeInterface $expiresAt = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $password = null;
@@ -67,12 +70,12 @@ class Link
         return $this;
     }
 
-    public function getExpiresAt(): ?\DateTimeInterface
+    public function getExpiresAt(): ?DateTimeInterface
     {
         return $this->expiresAt;
     }
 
-    public function setExpiresAt(\DateTimeInterface $expiresAt): static
+    public function setExpiresAt(DateTimeInterface $expiresAt): static
     {
         $this->expiresAt = $expiresAt;
 
