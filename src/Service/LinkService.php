@@ -10,7 +10,7 @@ use HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use ZipArchive;
 
-class LinkFileService
+class LinkService
 {
     private LinkRepository $linkRepository;
 

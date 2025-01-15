@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Tests\Container;
+namespace App\Tests\Container\Repository;
 
-use App\Entity\Link;
-use App\Repository\LinkRepository;
-use App\Tests\Creator;
+use App\Entity\File;
+use App\Repository\FileRepository;
+use DateTime;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Testcontainers\Container\MySQLContainer;
 use Testcontainers\Wait\WaitForLog;
 
-class LinkRepositoryContainerTest extends KernelTestCase
+class FileRepositoryContainerTest extends KernelTestCase
 {
     private static ?MySQLContainer $mysqlContainer = null;
     private static ?string $dsn = null;
@@ -58,41 +58,24 @@ class LinkRepositoryContainerTest extends KernelTestCase
     public function testSave(): void
     {
         // Arrange: retrieve the repository from the container
-        /** @var LinkRepository $linkRepository */
-        $linkRepository = $this->entityManager->getRepository(Link::class);
+        /** @var FileRepository $fileRepository */
+        $fileRepository = $this->entityManager->getRepository(File::class);
 
-        $file = Creator::createFile("example.txt");
-        $this->entityManager->persist($file);
-        $this->entityManager->flush();
-
-        // Act: create & save a Link
-        $link = $linkRepository->save($file->getId(), null);
-
-        // Assert: can be fetched back from the DB
-        $savedLink = $linkRepository->find($link->getId());
-
-        $this->assertNotNull($savedLink);
-        $this->assertSame($savedLink->getId(), $link->getId());
-    }
-
-    public function testFindOneByToken(): void
-    {
-        // Arrange: retrieve the repository from the container
-        /** @var LinkRepository $linkRepository */
-        $linkRepository = $this->entityManager->getRepository(Link::class);
-
-        $file = Creator::createFile("example.txt");
-        $this->entityManager->persist($file);
-        $this->entityManager->flush();
-
-        // Act: create & save a Link
-        $link = $linkRepository->save($file->getId(), null);
+        // Act: create & save a File
+        $file = $fileRepository->save(
+            'test-file.txt',
+            '/uploads/test-file.txt',
+            123456,
+            new DateTime(),
+            'image/png'
+        );
 
         // Assert: can be fetched back from the DB
-        $savedLink = $linkRepository->find($link->getId());
+        $savedFile = $this->entityManager->getRepository(File::class)
+            ->find($file);
 
-        $this->assertNotNull($savedLink);
-        $this->assertSame($savedLink->getId(), $link->getId());
+        $this->assertNotNull($savedFile);
+        $this->assertSame('test-file.txt', $savedFile->getFileName());
     }
 
     protected function tearDown(): void

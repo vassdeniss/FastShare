@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Dto\LinkDto;
 use App\Service\FileService;
-use App\Service\LinkFileService;
+use App\Service\LinkService;
 use Flasher\Prime\FlasherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -18,10 +18,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/link')]
 class LinkController extends AbstractController
 {
-    private LinkFileService $linkFileService;
+    private LinkService $linkFileService;
     private FileService $fileService;
 
-    public function __construct(LinkFileService $linkFileService, FileService $fileService)
+    public function __construct(LinkService $linkFileService, FileService $fileService)
     {
         $this->linkFileService = $linkFileService;
         $this->fileService = $fileService;
